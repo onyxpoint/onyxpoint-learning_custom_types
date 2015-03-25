@@ -21,7 +21,7 @@ end
 # mandatory gems
 gem 'bundler'
 gem 'rake'
-gem 'puppet'
+gem 'puppet', '>= 3'
 gem 'puppet-lint'
 gem 'puppetlabs_spec_helper'
 gem 'puppet_module_spec_helper'
