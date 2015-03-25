@@ -1,3 +1,5 @@
+require 'pry' if ENV['PRY']
+
 module Puppet
   Puppet::Type.newtype(:example_type) do
     @doc = <<-EOM
@@ -13,6 +15,7 @@ module Puppet
       # catalog is not completely compiled yet. However, you *can* get
       # to the class parameters.
       Puppet.warning("#{self[:name]}: Type Initializing")
+      binding.pry if defined?(Pry)
 
       # You can also dig through the currently compiled catalog.
       num_example_types = @catalog.resources.find_all { |r|
@@ -20,6 +23,7 @@ module Puppet
       }.count
 
       Puppet.warning("#{self[:name]}: Number of Example_types in the catalog: '#{num_example_types+1}'")
+      binding.pry if defined?(Pry)
 
       # Notice, here, we have to use 'self[:name]' while, in the
       # parameters and properties, we have to use 'resource[:name]' due to the
@@ -29,6 +33,7 @@ module Puppet
     def finish
       # Stuff to do at the end of your type run.
       Puppet.warning("#{self[:name]}: Type Finishing")
+      binding.pry if defined?(Pry)
       
       # Don't forget to call this *at the end*
       super
@@ -40,12 +45,14 @@ module Puppet
       isnamevar
 
       munge do |value|
-        Puppet.warning("#{resource[:name]}: Param :name -> Munging '#{value}'")
+        Puppet.warning("#{value}: Param :name -> Munging '#{value}'")
+        binding.pry if defined?(Pry)
         value
       end
 
       validate do |value|
-        Puppet.warning("#{resource[:name]}: Param :name -> Validating '#{value}'")
+        Puppet.warning("#{value}: Param :name -> Validating '#{value}'")
+        binding.pry if defined?(Pry)
       end
     end
 
@@ -61,16 +68,18 @@ module Puppet
       isrequired 
 
       # Can't get to resource[:name] here!
-      Puppet.warning("Param :foo -> Starting")
+      Puppet.warning("#{@name}: Param :foo -> Starting")
 
       validate do |value|
-        Puppet.warning("#{resource[:name]}: Param :foo -> Validating '#{value}'")
+        Puppet.warning("#{@resource[:name]}: Param :foo -> Validating '#{value}'")
+        binding.pry if defined?(Pry)
       end
 
       munge do |value|
         Puppet.warning("#{resource[:name]}: Param :foo -> Munging '#{value}'")
         # Order matters!!
         Puppet.warning("#{resource[:name]}: Param :foo -> :bar is '#{resource[:bar]}'")
+        binding.pry if defined?(Pry)
 
         value
       end
@@ -82,12 +91,14 @@ module Puppet
       EOM
 
       # Can't get to resource[:name] here!
-      Puppet.warning("Property :baz -> Starting")
+      Puppet.warning("#{@name}: Property :baz -> Starting")
+      binding.pry if defined?(Pry)
 
       validate do |value|
-        Puppet.warning("#{resource[:name]}: Property :baz -> Validating '#{value}'")
+        Puppet.warning("#{@resource[:name]}: Property :baz -> Validating '#{value}'")
         Puppet.warning("#{resource[:name]}: Property :baz -> :foo is '#{resource[:foo]}'")
         Puppet.warning("#{resource[:name]}: Property :baz -> :bar is '#{resource[:bar]}'")
+        binding.pry if defined?(Pry)
       end
 
       def insync?(is)
@@ -103,6 +114,8 @@ module Puppet
         # you're not in the property any more, you're in the :baz property
         # object.
         Puppet.warning("#{@resource[:name]}: Property :baz -> insync?")
+        binding.pry if defined?(Pry)
+
         # We're returning false just to see the rest of the components
         # fire off.
         false
@@ -119,16 +132,19 @@ module Puppet
       isrequired
 
       # Can't get to resource[:name] here!
-      Puppet.warning("Param :bar -> Starting")
+      Puppet.warning("#{@name}: Param :bar -> Starting")
+      binding.pry if defined?(Pry)
 
       validate do |value|
-        Puppet.warning("#{resource[:name]}: Param :bar -> Validating '#{value}'")
+        Puppet.warning("#{@resource[:name]}: Param :bar -> Validating '#{value}'")
+        binding.pry if defined?(Pry)
       end
 
       munge do |value|
         Puppet.warning("#{resource[:name]}: Param :bar -> Munging '#{value}'")
         # Order matters!!
         Puppet.warning("#{resource[:name]}: Param :bar -> :foo is '#{resource[:foo]}'")
+        binding.pry if defined?(Pry)
 
         value
       end
@@ -139,6 +155,8 @@ module Puppet
     validate do
       required_params = [:foo, :bar, :baz]
       Puppet.warning("#{self[:name]}: Validating")
+      binding.pry if defined?(Pry)
+
       required_params.each do |param|
         if not self[param] then
           # Note how we show the user *where* the error is.
@@ -149,20 +167,28 @@ module Puppet
 
     autorequire(:file) do
       Puppet.warning("#{self[:name]}: Autorequring file '/tmp/foo'")
+      binding.pry if defined?(Pry)
+
       ["/tmp/foo"]
     end
 
     if Gem::Version.new(Puppet.version) >= Gem::Version.new('4.0.0-alpha')
       autobefore(:service) do
         Puppet.warning("#{self[:name]}: Autobeforing service 'foo_service'")
+        binding.pry if defined?(Pry)
+
         ["foo_service"]
       end
       autosubscribe(:file) do
         Puppet.warning("#{self[:name]}: Autosubscribing file '/tmp/bar'")
+        binding.pry if defined?(Pry)
+
         ["/tmp/bar"]
       end
       autonotify(:exec) do
         Puppet.warning("#{self[:name]}: Autonotifying exec 'run_me'")
+        binding.pry if defined?(Pry)
+
         ["run_me"]
       end
     end
