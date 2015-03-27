@@ -1,5 +1,6 @@
 require 'pry' if ENV['PRY']
 
+# A custom type to demonstrate how custom types function.
 module Puppet
   Puppet::Type.newtype(:example_type) do
     @doc = <<-EOM
@@ -18,11 +19,11 @@ module Puppet
       binding.pry if defined?(Pry)
 
       # You can also dig through the currently compiled catalog.
-      num_example_types = @catalog.resources.find_all { |r|
+      num_example_types = @catalog.resources.select do |r|
         r.is_a?(Puppet::Type.type(:example_type))
-      }.count
+      end.count
 
-      Puppet.warning("#{self[:name]}: Number of Example_types in the catalog: '#{num_example_types+1}'")
+      Puppet.warning("#{self[:name]}: Number of Example_types in the catalog: '#{num_example_types + 1}'")
       binding.pry if defined?(Pry)
 
       # Notice, here, we have to use 'self[:name]' while, in the
@@ -34,13 +35,13 @@ module Puppet
       # Stuff to do at the end of your type run.
       Puppet.warning("#{self[:name]}: Type Finishing")
       binding.pry if defined?(Pry)
-      
+
       # Don't forget to call this *at the end*
       super
     end
 
     newparam(:name) do
-      desc "An arbitrary, but unique, name for the resource."
+      desc 'An arbitrary, but unique, name for the resource.'
 
       isnamevar
 
@@ -65,7 +66,7 @@ module Puppet
       # Though supported, isrequired just doesn't do anything.
       # See https://projects.puppetlabs.com/issues/4049 for more
       # information
-      isrequired 
+      isrequired
 
       # Can't get to resource[:name] here!
       Puppet.warning("#{@name}: Param :foo -> Starting")
@@ -107,9 +108,17 @@ module Puppet
         #
         # You will probably want something much more involved if you call this
         # at all.
-        
+        #
+
+        # rubocop:disable Lint/Void
         is == @should
-        
+
+        # Translation:
+        #
+        # is => The system value
+        # @should => What you passed in/munged for the property
+        #
+
         # Note, you have to use @resource, not resource here since
         # you're not in the property any more, you're in the :baz property
         # object.
@@ -158,9 +167,9 @@ module Puppet
       binding.pry if defined?(Pry)
 
       required_params.each do |param|
-        if not self[param] then
+        unless self[param]
           # Note how we show the user *where* the error is.
-          raise Puppet::ParseError,"Hey, I need :#{param} in #{self.ref} at line #{self.file}:#{self.line}"
+          fail Puppet::ParseError, "Hey, I need :#{param} in #{ref} at line #{file}:#{line}"
         end
       end
     end
@@ -169,7 +178,7 @@ module Puppet
       Puppet.warning("#{self[:name]}: Autorequring file '/tmp/foo'")
       binding.pry if defined?(Pry)
 
-      ["/tmp/foo"]
+      ['/tmp/foo']
     end
 
     if Gem::Version.new(Puppet.version) >= Gem::Version.new('4.0.0-alpha')
@@ -177,19 +186,19 @@ module Puppet
         Puppet.warning("#{self[:name]}: Autobeforing service 'foo_service'")
         binding.pry if defined?(Pry)
 
-        ["foo_service"]
+        ['foo_service']
       end
       autosubscribe(:file) do
         Puppet.warning("#{self[:name]}: Autosubscribing file '/tmp/bar'")
         binding.pry if defined?(Pry)
 
-        ["/tmp/bar"]
+        ['/tmp/bar']
       end
       autonotify(:exec) do
         Puppet.warning("#{self[:name]}: Autonotifying exec 'run_me'")
         binding.pry if defined?(Pry)
 
-        ["run_me"]
+        ['run_me']
       end
     end
   end

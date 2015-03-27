@@ -1,17 +1,17 @@
 Puppet::Type.type(:example_type).provide(:ruby) do
 
-  Puppet.warning("Setting Property Class Variables")
+  Puppet.warning('Setting Property Class Variables')
   # If you didn't read the previous post, these are *global*.
   $example_type_classvars = {
-   :example => true,
-   :count => 0,
-   :initialized => false
+    :example => true,
+    :count => 0,
+    :initialized => false
   }
 
   def initialize(*args)
     super(*args)
 
-    Puppet.warning("Provider: Initializing Classvars")
+    Puppet.warning('Provider: Initializing Classvars')
     $example_type_classvars[:initialized] = true unless $example_type_classvars[:initialized]
 
     Puppet.warning("Provider Initialization :name= '#{@resource[:name]}'")
@@ -29,6 +29,7 @@ Puppet::Type.type(:example_type).provide(:ruby) do
     'system_baz'
   end
 
+  # rubocop:disable Lint/UnusedMethodArgument
   def baz=(should)
     Puppet.warning("#{@resource[:name]}: Provider: Property :baz -> setter")
     binding.pry if defined?(Pry)
@@ -40,11 +41,11 @@ Puppet::Type.type(:example_type).provide(:ruby) do
   end
 
   def self.post_resource_eval
-    Puppet.warning("Provider: All Resource Application Complete")
+    Puppet.warning('Provider: All Resource Application Complete')
     binding.pry if defined?(Pry)
 
     if $example_type_classvars[:initialized]
-      Puppet.warning("Provider: Destroying Classvars")
+      Puppet.warning('Provider: Destroying Classvars')
       binding.pry if defined?(Pry)
 
       $example_type_classvars = nil

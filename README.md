@@ -22,23 +22,15 @@ cd learning_custom_types
 # Optional
 # bundle
 
-cd learning_custom_types
-puppet apply --basemodulepath=$PWD/../ tests/init.pp
+rake Run_Walkthrough
 ```
 
 ##Pry
 
-If you want to step through the code using [Pry](https://github.com/pry/pry),
-set a **PRY** environment variable.
+You can also step through the code using [Pry](https://github.com/pry/pry),
 
 ```bash
-export PRY=true
-```
-
-To stop using Pry, simply unset the variable.
-
-```bash
-unset PRY
+rake Run_Walkthrough[yes]
 ```
 
 ##Support

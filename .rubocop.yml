@@ -1,0 +1,20 @@
+# For the use of Pry in the Walkthrough
+Lint/Debugger:
+  Enabled: false
+
+# For the use of the global state variables in the provider.
+# For some reason, the comment-based disabling did not work properly.
+Style/GlobalVars:
+  Enabled: false
+
+HashSyntax:
+  EnforcedStyle: hash_rockets
+
+LineLength:
+  Max: 132
+
+AccessorMethodName:
+  Enabled: false
+
+MethodLength:
+  Max: 20
