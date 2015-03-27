@@ -7,6 +7,15 @@ module Puppet
       A type demonstrating execution order on the Puppet server.
     EOM
 
+    # This describes a feature that you're going to implement in your provider
+    #
+    # This is *not* mandatory, but you must have it if you want to disable
+    # parameters or properties based on provider features
+    #
+    # See the documentation for additional details
+    feature :walkthrough, 'The ability to do a Walkthrough'
+    feature :move_along_nothing_to_see_here, 'Just a stub'
+
     def initialize(args)
       # Do this *first* since you want the type to set up properly
       # before you start messing about with it.
@@ -38,6 +47,12 @@ module Puppet
 
       # Don't forget to call this *at the end*
       super
+    end
+
+    # Do some sanity checking before *executing* on the system
+    def pre_run_check
+      Puppet.warning("#{self[:name]}: Doing some pre-run checks")
+      binding.pry if defined?(Pry)
     end
 
     newparam(:name) do
@@ -123,6 +138,8 @@ module Puppet
         # you're not in the property any more, you're in the :baz property
         # object.
         Puppet.warning("#{@resource[:name]}: Property :baz -> insync?")
+        Puppet.warning("#{@resource[:name]}: My provider has feature :walkthrough!") if provider.feature?(:walkthrough)
+        Puppet.warning("#{@resource[:name]}: My provider has feature :something_random!") if provider.feature?(:something_random)
         binding.pry if defined?(Pry)
 
         # We're returning false just to see the rest of the components
@@ -133,7 +150,9 @@ module Puppet
 
     # Please keep your Parameters and Properties grouped together. This is just
     # to show you the ordering in the Property above.
-    newparam(:bar) do
+    #
+    # This parameter requires the :walkthrough feature
+    newparam(:bar, :required_features => %w(walkthrough)) do
       desc <<-EOM
         And, bar!
       EOM
@@ -157,6 +176,18 @@ module Puppet
 
         value
       end
+    end
+
+    # I'm not sure why the :required_features set here isn't causing this to
+    # fail if you use the 'bad' parameter
+    newparam(:bad, :required_features => %w(move_along_nothing_to_see_here)) do
+      desc <<-EOM
+        A parameter that just can't be used due to missing features in the provider.
+        Try using it to see what happens!
+      EOM
+      defaultto :bad_stuff
+
+      binding.pry if defined?(Pry)
     end
 
     # Ok, since 'isrequired' doesn't do anything (but it does set a

@@ -17,6 +17,9 @@ class learning_custom_types {
     foo => 'example_one_foo',
     bar => 'example_one_bar',
     baz => 'example_one_baz',
+    # If you set this, then the type should not be able to find a suitable
+    # provider...but it does...
+    #bad => 'foo'
   }
 
   example_type { 'example_type_two':
